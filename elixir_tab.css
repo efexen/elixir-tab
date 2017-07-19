@@ -60,6 +60,13 @@ h2.section-heading {
   display: none;
 }
 
+span.note {
+  padding-left: 15px;
+  font-style: italic;
+  margin-top: 1em;
+  display: block;
+}
+
 .specs {
   padding-left: 15px;
   font-style: italic;
