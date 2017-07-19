@@ -41,6 +41,7 @@ h2.section-heading {
   border: 1px solid #dadada;
   padding: 15px;
   display: block;
+  overflow: auto;
 }
 
 .view-source {
@@ -82,4 +83,5 @@ h2.section-heading {
   background: #fdfdfd;
   padding: 15px;
   border: 1px solid #dadada;
+  overflow: auto;
 }
