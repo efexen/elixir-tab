@@ -18,7 +18,7 @@ var ElixirTab = function() {
 
   function fetchModules() {
     var basePage = fetchPage(baseUrl + "Kernel.html");
-    var sidescript = Sizzle("head script[src*=sidebar_items]", basePage)[0]
+    var sidescript = basePage.querySelector("head script[src*=sidebar_items]");
     var side_url = baseUrl + sidescript.attributes["src"].value;
 
     var sideitems = fetchResource(side_url).slice(13);
@@ -63,7 +63,7 @@ var ElixirTab = function() {
       .replace("?", '\\\?')
       .replace("!", '\\\!');
 
-    return Sizzle("#" + selector, docpage)[0];
+    return docpage.querySelector("#" + selector);
   }
 
   function createModuleTitle(module) {
