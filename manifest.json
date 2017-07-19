@@ -5,7 +5,8 @@
   "description": "Little bit of Elixir in every new tab",
   "version": "0.0.2",
   "permissions": [
-    "https://hexdocs.pm/*"
+    "https://hexdocs.pm/*",
+    "storage"
   ],
   "chrome_url_overrides": {
     "newtab": "elixir_tab.html"

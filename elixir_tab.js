@@ -16,14 +16,35 @@ var ElixirTab = function() {
     return page;
   }
 
-  function fetchModules() {
-    var basePage = fetchPage(baseUrl + "Kernel.html");
-    var sidescript = basePage.querySelector("head script[src*=sidebar_items]");
-    var side_url = baseUrl + sidescript.attributes["src"].value;
+  function expired(timestamp) {
+    return timestamp < (Date.now() - 1000 * 60 * 60 * 24);
+  }
 
-    var sideitems = fetchResource(side_url).slice(13);
+  function cacheModules(modules) {
+    chrome.storage.local.set({
+      timestamp: Date.now(),
+      modules: modules
+    });
+  }
 
-    return JSON.parse(sideitems).modules;
+  function fetchModules(callback) {
+    chrome.storage.local.get(function(cache) {
+      var modules;
+
+      if (cache.modules && !expired(cache.timestamp)) {
+        modules = cache.modules;
+      } else {
+        var basePage = fetchPage(baseUrl + "Kernel.html");
+        var sidescript = basePage.querySelector("head script[src*=sidebar_items]");
+        var side_url = baseUrl + sidescript.attributes["src"].value;
+
+        var sideitems = fetchResource(side_url).slice(13);
+        modules = JSON.parse(sideitems).modules;
+        cacheModules(modules);
+      }
+
+      callback(modules);
+    });
   }
 
   function selectRandomElement(array) {
@@ -31,8 +52,7 @@ var ElixirTab = function() {
     return array[index];
   }
 
-  function findRandomModuleFunction() {
-    var modules = fetchModules();
+  function findRandomModuleFunction(modules) {
     var fun;
     var module;
     var counter = 0;
@@ -47,10 +67,10 @@ var ElixirTab = function() {
       counter++;
     }
 
-    return {
+    renderFunction({
       module: module,
       fun: fun
-    };
+    });
   }
 
   function fetchFunctionDoc(modulefun) {
@@ -85,8 +105,7 @@ var ElixirTab = function() {
     return container;
   }
 
-  function init() {
-    var modulefun = findRandomModuleFunction();
+  function renderFunction(modulefun) {
     var docs = fetchFunctionDoc(modulefun);
 
     var moduleTitle = createModuleTitle(modulefun.module);
@@ -99,6 +118,10 @@ var ElixirTab = function() {
     container.append(docs);
 
     document.body.append(container);
+  }
+
+  function init() {
+    fetchModules(findRandomModuleFunction);
   };
 
   return {
