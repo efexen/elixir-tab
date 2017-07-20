@@ -1,19 +1,20 @@
 var ElixirTab = function() {
   var baseUrl = "https://hexdocs.pm/elixir/";
 
-  function fetchResource(url) {
-    var xhr = new XMLHttpRequest();
-
-    xhr.open("GET", url, false);
-    xhr.send();
-
-    return xhr.responseText;
+  function fetchResource(url, callback) {
+    window.fetch(url).then(function(response) {
+      return response.text();
+    }).then(function(data) {
+      callback(null, data);
+    }).catch(callback);
   }
 
-  function fetchPage(url) {
+  function fetchPage(url, callback) {
     var page = document.createElement("html");
-    page.innerHTML = fetchResource(url);
-    return page;
+    fetchResource(url, function(err, data) {
+      page.innerHTML = data;
+      callback(page);
+    });
   }
 
   function expired(timestamp) {
@@ -29,21 +30,22 @@ var ElixirTab = function() {
 
   function fetchModules(callback) {
     chrome.storage.local.get(function(cache) {
-      var modules;
 
       if (cache.modules && !expired(cache.timestamp)) {
-        modules = cache.modules;
-      } else {
-        var basePage = fetchPage(baseUrl + "Kernel.html");
+        return callback(cache.modules);
+      }
+
+      fetchPage(baseUrl + "Kernel.html", function(basePage) {
         var sidescript = basePage.querySelector("head script[src*=sidebar_items]");
         var side_url = baseUrl + sidescript.attributes["src"].value;
 
-        var sideitems = fetchResource(side_url).slice(13);
-        modules = JSON.parse(sideitems).modules;
-        cacheModules(modules);
-      }
-
-      callback(modules);
+        fetchResource(side_url, function(err, data) {
+          var sideitems = data.slice(13);
+          var modules = JSON.parse(sideitems).modules;
+          cacheModules(modules);
+          callback(modules);
+        });
+      });
     });
   }
 
@@ -73,17 +75,17 @@ var ElixirTab = function() {
     });
   }
 
-  function fetchFunctionDoc(modulefun) {
+  function fetchFunctionDoc(modulefun, callback) {
     var pageurl = baseUrl + modulefun.module.id + ".html";
 
-    var docpage = fetchPage(pageurl);
+    fetchPage(pageurl, function(docpage) {
+      var selector = modulefun.fun.anchor
+        .replace("/", '\\\/')
+        .replace("?", '\\\?')
+        .replace("!", '\\\!');
 
-    var selector = modulefun.fun.anchor
-      .replace("/", '\\\/')
-      .replace("?", '\\\?')
-      .replace("!", '\\\!');
-
-    return docpage.querySelector("#" + selector);
+      return callback(docpage.querySelector("#" + selector));
+    });
   }
 
   function createModuleTitle(module) {
@@ -106,18 +108,18 @@ var ElixirTab = function() {
   }
 
   function renderFunction(modulefun) {
-    var docs = fetchFunctionDoc(modulefun);
+    fetchFunctionDoc(modulefun, function(docs) {
+      var moduleTitle = createModuleTitle(modulefun.module);
+      var functionTitle = createFunctionTitle(modulefun.fun);
 
-    var moduleTitle = createModuleTitle(modulefun.module);
-    var functionTitle = createFunctionTitle(modulefun.fun);
+      var container = createContainer();
 
-    var container = createContainer();
+      container.append(moduleTitle);
+      container.append(functionTitle);
+      container.append(docs);
 
-    container.append(moduleTitle);
-    container.append(functionTitle);
-    container.append(docs);
-
-    document.body.append(container);
+      document.body.append(container);
+    });
   }
 
   function init() {
