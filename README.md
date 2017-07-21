@@ -16,3 +16,9 @@ You can either install from [Chrome Webstore](https://chrome.google.com/webstore
 ### Powered by
 - Elixir Documentation [hexdocs](https://hexdocs.pm/)
 - Github SVG icon [Simple Icons](https://simpleicons.org/)
+
+### Contributors
+
+Big thank you to these beautiful people for contributing
+
+- [Steve Lacy](https://github.com/stevelacy) Async fetch
