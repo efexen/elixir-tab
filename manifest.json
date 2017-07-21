@@ -3,7 +3,7 @@
 
   "name": "Elixir Tab",
   "description": "Little bit of Elixir in every new tab",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "permissions": [
     "https://hexdocs.pm/*",
     "storage"
