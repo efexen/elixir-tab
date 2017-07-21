@@ -6,7 +6,21 @@ var ElixirTab = function() {
       return response.text();
     }).then(function(data) {
       callback(null, data);
-    }).catch(callback);
+    }).catch(handleError);
+  }
+
+  function handleError(err) {
+    var container = createContainer();
+
+    var errorTitle = document.createElement("h2");
+    errorTitle.innerText = "Oh no something went wrong getting the docs :(";
+    errorTitle.className = "error-title";
+
+    console.log(err);
+
+    container.append(errorTitle);
+
+    document.body.append(container);
   }
 
   function fetchPage(url, callback) {
@@ -107,16 +121,26 @@ var ElixirTab = function() {
     return container;
   }
 
+  function createHexdocsLink(modulefun) {
+    var link = document.createElement("a");
+    link.innerText = "Open in hexdocs.pm";
+    link.href = baseUrl + modulefun.module.id + ".html#" + modulefun.fun.anchor;
+    link.className = "hexdocs-link";
+    return link;
+  }
+
   function renderFunction(modulefun) {
     fetchFunctionDoc(modulefun, function(docs) {
       var moduleTitle = createModuleTitle(modulefun.module);
       var functionTitle = createFunctionTitle(modulefun.fun);
+      var hexdocsLink = createHexdocsLink(modulefun);
 
       var container = createContainer();
 
       container.append(moduleTitle);
       container.append(functionTitle);
       container.append(docs);
+      container.append(hexdocsLink);
 
       document.body.append(container);
     });

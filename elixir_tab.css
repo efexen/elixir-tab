@@ -36,6 +36,10 @@ h2.section-heading {
   margin-bottom: 5px;
 }
 
+h2.error-title {
+  text-align: center;
+}
+
 .signature {
   background: #fdfdfd;
   border: 1px solid #dadada;
@@ -77,6 +81,10 @@ span.note {
   color: #333;
 }
 
+.specs pre {
+  white-space: pre-wrap;
+}
+
 .main {
   width: 40%;
   margin: 100px auto;
@@ -91,4 +99,11 @@ span.note {
   padding: 15px;
   border: 1px solid #dadada;
   overflow: auto;
+}
+
+.hexdocs-link {
+  display: block;
+  margin-top: 2px;
+  text-align: center;
+  text-decoration: underline;
 }
