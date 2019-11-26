@@ -68,16 +68,25 @@ var ElixirTab = function() {
     return array[index];
   }
 
+  function onlyFunctionKeys(group) {
+    return group.key === "functions"; 
+  }
+
   function findRandomModuleFunction(modules) {
     var fun;
+    var functionEntries = [];
     var module;
     var counter = 0;
 
     while (!fun && counter < 50) {
       module = selectRandomElement(modules);
 
-      if (module && module.functions) {
-        fun = selectRandomElement(module.functions);
+      if (module && module.nodeGroups) {
+        functionEntries = module.nodeGroups.filter(onlyFunctionKeys);
+      }
+
+      if (module && functionEntries.length > 0) {
+        fun = selectRandomElement(functionEntries[0].nodes);
       }
 
       counter++;
